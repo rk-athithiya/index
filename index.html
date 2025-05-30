@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nothing Here</title>
+  <style>
+    body {
+      background: white;
+      margin: 0;
+      height: 100vh;
+    }
+    #copyBtn {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 30px;
+      height: 30px;
+      opacity: 0.85; /* Visible for practice */
+      z-index: 9999;
+      border: none;
+      background: pink;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <button id="copyBtn" onclick="copyCode()">Copy</button>
+  <textarea id="code" style="position:absolute;left:-9999px;">
+; Paste your 8085 program here!
+LXI H, 4150
+MOV A, M
+MOV B, A
+RRC
+RRC
+RRC
+RRC
+ANI 0F
+INX H
+MOV M, A
+MOV A, B
+ANI 0F
+INX H
+MOV M, A
+HLT
+  </textarea>
+  <script>
+    function copyCode() {
+      var code = document.getElementById("code");
+      code.select();
+      document.execCommand("copy");
+      // Optional: alert("Copied!");
+    }
+  </script>
+</body>
+</html>
