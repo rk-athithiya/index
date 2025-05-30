@@ -25,7 +25,164 @@
 <body>
   <button id="copyBtn" onclick="copyCode()">Copy</button>
   <textarea id="code" style="position:absolute;left:-9999px;">
-; Paste your 8085 program here!
+; 8085 Program for 8-bit Addition (Result Stored in Memory)
+LDA 4150
+MOV B, A
+LDA 4151
+ADD B
+STA 4152
+HLT
+
+; 8085 Program for 16-bit Addition
+LHLD 4150
+XCHG
+LHLD 4152
+DAD D
+SHLD 4154
+HLT
+
+; 8085 Program for 8-bit Subtraction
+LXI H, 4150
+MOV A, M
+INX H
+SUB M
+INX H
+MOV M, A
+HLT
+
+; 8085 Program for 16-bit Subtraction
+LHLD 4150
+XCHG
+LHLD 4152
+MVI C, 00
+MOV A, E
+SUB L
+STA 4154
+MOV A, D
+SBB H
+STA 4155
+HLT
+
+; 8085 Program for Multiplication (using repeated addition)
+
+LHLD 4150
+XCHG
+MOV C, D
+MVI D, 00
+LXI H, 0000
+
+START: DAD D
+DCR C
+JNZ START
+
+SHLD 4152
+HLT
+
+
+; 8085 Program for 8-bit Division
+LXI H, 4150
+MOV B, M
+MVI C, 00
+INX H
+MOV A, M
+HELLO: CMP B
+JC START
+SUB B
+INR C
+JMP HELLO
+START: STA 4200
+MOV A, C
+STA 4201
+HLT
+
+    
+; Ascending Order
+LXI H, 4200H
+MOV C, M
+DCR C
+REPEAT:
+MOV D, C
+LXI H, 4201H
+LOOP:
+MOV A, M
+INX H
+CMP M
+JC SKIP
+MOV B, M
+MOV M, A
+DCX H
+MOV M, B
+INX H
+SKIP:
+DCR D
+JNZ LOOP
+DCR C
+JNZ REPEAT
+HLT
+
+; Descending Order
+LXI H, 4200H
+MOV C, M
+DCR C
+REPEAT:
+MOV D, C
+LXI H, 4201H
+LOOP:
+MOV A, M
+INX H
+CMP M
+JNC SKIP
+MOV B, M
+MOV M, A
+DCX H
+MOV M, B
+INX H
+SKIP:
+DCR D
+JNZ LOOP
+DCR C
+JNZ REPEAT
+HLT
+
+;  Max Value Array
+
+LXI H, 4200H
+MOV B, M
+MOV C, B
+INX H
+MOV A, M
+DCR B
+LOOP:
+INX H
+CMP M
+JNC SKIP
+MOV A, M
+SKIP:
+DCR B
+JNZ LOOP
+STA 4300H
+HLT
+
+; Min Value Array
+
+LXI H, 4200H
+MOV B, M
+INX H
+MOV A, M
+DCR B
+LOOP:
+INX H
+CMP M
+JC SKIP
+MOV A, M
+SKIP:
+DCR B
+JNZ LOOP
+STA 4300H
+HLT
+
+; Separate Upper and Lower Nibbles of a Byte
+
 LXI H, 4150
 MOV A, M
 MOV B, A
@@ -41,6 +198,311 @@ ANI 0F
 INX H
 MOV M, A
 HLT
+
+; ASCII Value to Hexadecimal
+
+LDA 5000H
+SUI 30H
+CPI 0AH
+JC SKIP
+SUI 07H
+SKIP: STA 5001H
+HLT
+
+; ASCII Array to Hex
+
+LDA 4200H
+MOV C, A
+LXI H, 4201H
+LXI D, 4301H
+
+Loop1:
+MOV A, M
+SUI 30H
+CPI 0AH
+JC Loop2
+SUI 07H
+
+Loop2:
+STAX D
+DCR C
+JNZ Endloop
+INX H
+INX D
+
+Endloop:
+HLT
+
+; Hexadecimal Digit to ASCII
+
+LXI H, 2050H
+MOV A, M
+CPI 41H
+JC NUM
+SUI 37H
+JMP STORE
+
+NUM: SUI 30H
+
+STORE: INX H
+MOV M, A
+HLT
+
+
+; BCD to Binary
+
+LXI H, 2050H
+MOV A, M
+MOV B, A
+ANI 0Fh
+MOV C, A
+MOV A, B
+ANI 0F0H
+RRC
+RRC
+RRC
+RRC
+MOV D, A
+MVI E, 0AH
+CALL MULTIPLY
+ADD C
+INX H
+MOV M, A
+HLT
+
+MULTIPLY: MVI A, 00H
+LOOP: ADD D
+DCR E
+JNZ LOOP
+RET
+
+; Binary to BCD
+
+LXI H, 2050H
+MOV A, M
+MVI B, 00H
+
+LOOP: SUI 64H
+JC SKIP
+INR B
+JMP LOOP
+
+SKIP: ADI 64H
+MVI C, 00H
+
+LOOP2: SUI 0AH
+JC SKIP2
+INR C
+JMP LOOP2
+
+SKIP2: ADI 0AH
+STA 2052H
+MOV A, C
+STA 2051H
+MOV A, B
+STA 2050H
+HLT
+
+; 8051 Program for 16-bit Addition
+
+ORG 4100H
+MOV R0, #00H
+MOV A, @R0
+MOV R1, #02H
+ADD A, @R1
+MOV R2, #50H
+MOV @R2, A
+
+MOV R0, #01H
+MOV A, @R0
+MOV R1, #03H
+ADDC A, @R1
+INC R2
+MOV @R2, A
+
+MOV A, #00H
+ADDC A, #00H
+INC R2
+MOV @R2, A
+
+END
+
+
+; 8051 Program for 8-bit Subtraction and Addition with Carry
+
+ORG 4100H
+MOV A, #55H
+MOV 00H, A
+MOV A, #22H
+MOV 01H, A
+MOV A, 00H
+SUBB A, 01H
+MOV 50H, A
+MOV A, #00H
+ADDC A, #00H
+MOV 51H, A
+END
+
+
+; 8051 Program for 8-bit Multiplication (Result in External Memory)
+
+ORG 4000H
+MOV DPTR, #4100H
+MOVX A, @DPTR
+MOV B, A
+INC DPTR
+MOVX A, @DPTR
+MUL AB
+MOV DPTR, #4510H
+MOVX @DPTR, A
+INC DPTR
+MOV A, B
+MOVX @DPTR, A
+END
+
+; 8051 Program for 8-bit Division
+
+ORG 4100H
+DIVIDEND EQU 25H
+DIVISOR  EQU 07H
+MOV A, #DIVIDEND
+MOV B, #DIVISOR
+DIV AB
+MOV 4150H, A  ; Quotient
+MOV 4151H, B  ; Remainder
+END-LOOP:
+SJMP END-LOOP
+END
+
+; 8051 Program to Find the Sum of an Array (External Memory)
+
+ORG 4100H
+MOV 4200H, #12H
+MOV 4201H, #34H
+MOV 4202H, #56H
+MOV 4203H, #78H
+MOV 4204H, #9AH
+
+MOV R0, #05H
+MOV R1, #00H
+MOV DPTR, #4200H
+
+SUM-LOOP:
+MOVX A, @DPTR
+ADD A, R1
+MOV R1, A
+INC DPTR
+DJNZ R0, SUM-LOOP
+
+MOV 4150H, R1
+END-LOOP:
+SJMP END-LOOP
+END
+
+
+; 8051 Program to Sort an Array (Ascending) and Find the Largest Number
+
+ORG 4100H
+INPUT_ARRAY    EQU 4200H
+SORTED_ARRAY   EQU 4300H
+BIGGEST_NUM    EQU 4150H
+ARRAY_SIZE     EQU 05H
+
+MOV 4200H, #45H
+MOV 4201H, #12H
+MOV 4202H, #78H
+MOV 4203H, #23H
+MOV 4204H, #56H
+
+MOV R0, #ARRAY_SIZE-1
+
+SORT_OUTER:
+    MOV DPTR, #INPUT_ARRAY
+    MOV R1, #ARRAY_SIZE-1
+    MOV R2, #00H
+
+SORT_INNER:
+    MOVX A, @DPTR
+    CJNE MOV R3, A
+    INC DPTR
+    MOVX A, @DPTR
+    CJNE A, 03H, COMPARE
+    SJMP NO_SWAP
+
+COMPARE:
+    JNC NO_SWAP
+    MOV R4, A
+    MOV A, R3
+    MOVX @DPTR, A
+    DEC DPTR
+    MOV A, R4
+    MOVX @DPTR, A
+    INC DPTR
+    MOV R2, #01H
+
+NO_SWAP:
+    DJNZ R1, SORT_INNER
+    MOV A, R2
+    JZ SORT_DONE
+    DJNZ R0, SORT_OUTER
+
+SORT_DONE:
+    MOV R0, #ARRAY_SIZE
+    MOV DPTR, #INPUT_ARRAY
+    MOV DPTR2, #SORTED_ARRAY
+
+COPY_LOOP:
+    MOVX A, @DPTR
+    INC DPTR
+    MOVX @DPTR2, A
+    INC DPTR2
+    DJNZ R0, COPY_LOOP
+
+MOV DPTR, #INPUT_ARRAY+ARRAY_SIZE-1
+MOVX A, @DPTR
+MOV BIGGEST_NUM, A
+
+END_LOOP:
+    SJMP END_LOOP
+END
+
+; 8051 Program to Find the Largest Number in an Array
+
+ORG 4100H
+INPUT_ARRAY   EQU 4200H
+BIGGEST_NUM   EQU 4150H
+ARRAY_SIZE    EQU 05H
+
+MOV 4200H, #45H
+MOV 4201H, #12H
+MOV 4202H, #78H
+MOV 4203H, #23H
+MOV 4204H, #56H
+
+MOV DPTR, #INPUT_ARRAY
+MOVX A, @DPTR
+MOV R0, A
+MOV R1, #ARRAY_SIZE-1
+
+FINDLOOP:
+    INC DPTR
+    MOVX A, @DPTR
+    CJNE A, R0, COMPARE
+    SJMP NEXT_ELEMENT
+
+COMPARE:
+    JC NEXT_ELEMENT
+    MOV R0, A
+
+NEXT_ELEMENT:
+    DJNZ R1, FINDLOOP
+
+MOV BIGGEST_NUM, R0
+
+END_LOOP:
+    SJMP END_LOOP
+END
+
   </textarea>
   <script>
     function copyCode() {
