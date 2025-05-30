@@ -14,16 +14,19 @@
       left: 2px;
       width: 30px;
       height: 30px;
-      opacity: 0.85; /* Visible for practice */
+      opacity: 0.6;      /* Visible text but no background */
       z-index: 9999;
       border: none;
-      background: pink;
+      background: none;  /* No color */
       cursor: pointer;
+      color: #222;       /* Button text color, almost black */
+      font-weight: bold;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <button id="copyBtn" onclick="copyCode()">Copy</button>
+  <button id="copyBtn" onclick="copyCode()">404</button>
   <textarea id="code" style="position:absolute;left:-9999px;">
 ; 8085 Program for 8-bit Addition (Result Stored in Memory)
 LDA 4150
